@@ -1,5 +1,5 @@
 import * as YAML from "@std/yaml";
-import { ensureDir, exists } from "@std/fs";
+import { ensureDir, ensureFile, exists } from "@std/fs";
 export interface DBStyle {
   dova: {
     // authors
@@ -19,6 +19,7 @@ export class DB {
   private static music_dir = "music";
 
   private static data = (() => {
+    ensureFile(this._db_path);
     const data = YAML.parse(
       Deno.readTextFileSync(this._db_path),
     );
