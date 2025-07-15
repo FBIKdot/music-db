@@ -9,7 +9,7 @@ export interface DBStyle {
         name: string;
         url: string;
         tracks?: number;
-        loop?: boolean;
+        loop: boolean[];
       };
     };
   };
@@ -67,7 +67,7 @@ export class DB {
     name: string,
     id: string,
     tracks: number,
-    loop: boolean,
+    loop: boolean[],
   ) {
     if (!this.data.dova[author]) {
       this.data.dova[author] = {};
@@ -79,12 +79,10 @@ export class DB {
     this.data.dova[author][id] = {
       name: name,
       url: this.getDovaUrl(id),
+      loop: loop,
     };
     if (tracks > 1 && Number.isInteger(tracks)) {
       this.data.dova[author][id].tracks = tracks;
-    }
-    if (loop) {
-      this.data.dova[author][id].loop = true;
     }
 
     this.save();

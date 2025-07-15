@@ -26,10 +26,10 @@ if (import.meta.main) {
     }
   }
 }
-async function add(loop: boolean = false): Promise<void> {
-  if (loop) {
+async function add(is_loop_adding: boolean = false): Promise<void> {
+  if (is_loop_adding) {
     console.log(
-      "Loop adding until you input nothing when asking you for name, author or id",
+      "\nLoop adding until you input nothing when asking you for name, author or id",
     );
   }
 
@@ -46,24 +46,37 @@ async function add(loop: boolean = false): Promise<void> {
     console.log("no input anything");
     return Promise.resolve();
   }
+  const id: string = input2;
 
   const input3 = prompt("how many tracks>");
   if (!input3) {
     console.log("no input anything. default: only 1 track");
   }
-  const input4 = prompt("loop?(y)>");
-  if (input4 !== "y") {
-    console.log("input not 'y', default don't loop");
-  }
   const tracks = input3 ? Number(input3) : 1;
-  const id: string = input2;
+
+  const input4 = prompt(
+    `'loop? (type "y"${tracks !== 1 ? ', use "," to split each track' : ""})>`,
+  );
+  const loop: boolean[] = [];
+  if (!input4) {
+    console.log("input not available, default: both not loop");
+  } else {
+    for (const str of input4.split(",")) {
+      loop.push(str === "y");
+    }
+  }
+
   console.log(
     `Add music: ${name} - ${author} ${tracks} tracks ${DB.getDovaUrl(id)}`,
+    "\nloop:",
+    `${loop.map((v, i) => `track ${i + 1} ${v ? "✓" : "✕"}`).join(", ")}`,
   );
+
   // TODO: dova看起来不怎么变，也许可以爬取一些补充信息
-  DB.addDova(author, name, id, tracks, input4 === "y");
+  DB.addDova(author, name, id, tracks, loop);
   console.log("Database's changes were saved");
-  if (loop) {
+
+  if (is_loop_adding) {
     return Promise.resolve().then(() => add(true));
   }
 }
