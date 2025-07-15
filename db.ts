@@ -59,11 +59,13 @@ export class DB {
     id: string,
     tracks: number,
   ) {
+    if (!this.data.dova[author]) {
+      this.data.dova[author] = {};
+    }
     if (this.data.dova[author][id]) {
       console.log(`Music ${name}:${id} exist`);
       return;
     }
-    if (!this.data.dova[author]) this.data.dova[author] = {};
     this.data.dova[author][id] = {
       name: name,
       url: this.getDovaUrl(id),
@@ -74,6 +76,8 @@ export class DB {
 
     this.save();
   }
+
+  // TODO: add incompetech (https://incompetech.com/music/royalty-free/music.html)
 
   public static async sync() {
     await ensureDir(this.music_dir);
