@@ -31,6 +31,11 @@ export class DB {
     }
   })() as DBStyle;
   private static save() {
+    /**
+     * ES6 规范明确：对象中非数字字符串 key 的插入顺序保留，纯数字的字符串会被自动排序
+     * 相当于作者名称不排序，id 排序
+     * 正好符合我意
+     */
     Deno.writeTextFileSync(this._db_path, YAML.stringify(this.data));
   }
 
@@ -65,7 +70,7 @@ export class DB {
       this.data.dova[author] = {};
     }
     if (this.data.dova[author][id]) {
-      console.log(`Music ${name}:${id} exist`);
+      console.log(`Music ${name}:${id} has already existed!`);
       return;
     }
     this.data.dova[author][id] = {
