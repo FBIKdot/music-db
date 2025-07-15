@@ -58,6 +58,10 @@ export class DB {
     id: string,
     tracks: number,
   ) {
+    if (this.data.dova[author][id]) {
+      console.log(`Music ${name}:${id} exist`);
+      return;
+    }
     if (!this.data.dova[author]) this.data.dova[author] = {};
     this.data.dova[author][id] = {
       name: name,
