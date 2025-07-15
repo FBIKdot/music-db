@@ -50,11 +50,14 @@ export class DB {
   public static getDovaUrl(id: string) {
     return `https://dova-s.jp/EN/bgm/play${id}.html`;
   }
-  private static getDovaDownloadFilePath(id: string, tracks: number): string[] {
-    const list: string[] = [`/dova/mp3/${id}.mp3`];
+  private static getDovaFilesName(
+    id: string,
+    tracks: number,
+  ): string[] {
+    const list: string[] = [`${id}.mp3`];
     if (tracks !== 1) {
       for (let i = 2; i <= tracks; i++) {
-        list.push(`/dova/mp3/${id}_${i}.mp3`);
+        list.push(`${id}_${i}.mp3`);
       }
     }
     return list;
@@ -92,18 +95,23 @@ export class DB {
   public static async sync() {
     await ensureDir(this.music_dir);
     await ensureDir(`${this.music_dir}/${this.dova_music_dir}`);
-    const dova_music_list: [string, string][] = Object
+    const dova_music_list: [string, string, string][] = Object
       .values(this.data.dova)
       .flatMap((songs) =>
         Object.entries(songs).flatMap(([id, { tracks }]) => {
-          const paths = this.getDovaDownloadFilePath(id, tracks ? tracks : 1);
-          return paths.map((path) => [id, path] as [string, string]);
+          const paths = this.getDovaFilesName(id, tracks ? tracks : 1);
+          return paths.map((path) =>
+            [
+              id,
+              `/dova/mp3/${path}`,
+              `${this.music_dir}/${this.dova_music_dir}/${path}`,
+            ] as [string, string, string]
+          );
         })
       );
     console.log(dova_music_list);
     // TODO: 支持并发
-    for (const [id, url_path] of dova_music_list) {
-      const file_path = `${this.music_dir}/${this.dova_music_dir}/${id}.mp3`;
+    for (const [id, url_path, file_path] of dova_music_list) {
       if (await exists(file_path, { isFile: true })) {
         console.log(`File ${file_path} exist, skipping.`);
         continue;
