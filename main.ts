@@ -2,7 +2,7 @@ import { DB } from "./db.ts";
 
 if (import.meta.main) {
   while (true) {
-    console.log("Commands: add / add not dova(WIP) / view(WIP) / sync / exit");
+    console.log("Commands: add / sync / exit");
     const input: string | null = prompt(">");
     switch (input) {
       case null:
@@ -16,10 +16,7 @@ if (import.meta.main) {
       case "sync":
         await DB.sync();
         break;
-      case "add not dova":
-      case "view":
-        console.log("WIP");
-        break;
+      // TODO: 添加除了dova之外的music
       default:
         console.log("Unknow command.");
         break;
@@ -50,6 +47,7 @@ function add() {
   console.log(
     `Add music: ${name} - ${author} ${tracks} tracks ${DB.getDovaUrl(id)}`,
   );
+  // TODO: dova看起来不怎么变，也许可以爬取一些补充信息
   DB.addDova(author, name, id, tracks);
   return;
 }
