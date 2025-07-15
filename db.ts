@@ -87,7 +87,7 @@ export class DB {
         })
       );
     console.log(dova_music_list);
-
+    // TODO: 支持并发
     for (const [id, url_path] of dova_music_list) {
       const file_path = `${this.music_dir}/${this.dova_music_dir}/${id}.mp3`;
       if (await exists(file_path, { isFile: true })) {
@@ -98,7 +98,11 @@ export class DB {
         const url = `https://${domain}${url_path}`;
         console.log(`Download: ${url} ...`);
 
-        const response = await fetch(url);
+        const response = await fetch(url, {
+          headers: {
+            "Accept-Encoding": "br, gzip",
+          },
+        });
         if (response.ok) {
           const file = await Deno.open(file_path, {
             write: true,
