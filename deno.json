@@ -3,10 +3,13 @@
     "start": "deno run --allow-read --allow-write --allow-net main.ts"
   },
   "imports": {
-    "@std/assert": "jsr:@std/assert@1",
     "@std/cli": "jsr:@std/cli@^1.0.20",
     "@std/fs": "jsr:@std/fs@^1.0.19",
-    "@std/yaml": "jsr:@std/yaml@^1.0.8",
-    "cheerio": "npm:cheerio@^1.1.0"
+    "@std/yaml": "jsr:@std/yaml@^1.0.8"
+  },
+  "fmt": {
+    "exclude": [
+      "./db.yaml"
+    ]
   }
 }
