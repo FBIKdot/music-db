@@ -55,7 +55,7 @@ async function add(is_loop_adding: boolean = false): Promise<void> {
   const tracks = input3 ? Number(input3) : 1;
 
   const input4 = prompt(
-    `'loop? (type "y"${tracks !== 1 ? ', use "," to split each track' : ""})>`,
+    `loop? (type "y"${tracks !== 1 ? ', use "," to split each track' : ""})>`,
   );
   const loop: boolean[] = [];
   if (!input4) {
