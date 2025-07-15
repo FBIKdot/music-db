@@ -42,12 +42,16 @@ function add() {
   if (!input3) {
     console.log("no input anything. default: only 1 track");
   }
+  const input4 = prompt("loop?(y)>");
+  if (input4 !== "y") {
+    console.log("input not 'y', default don't loop");
+  }
   const tracks = input3 ? Number(input3) : 1;
   const id: string = input2;
   console.log(
     `Add music: ${name} - ${author} ${tracks} tracks ${DB.getDovaUrl(id)}`,
   );
   // TODO: dova看起来不怎么变，也许可以爬取一些补充信息
-  DB.addDova(author, name, id, tracks);
+  DB.addDova(author, name, id, tracks, input4 === "y");
   return;
 }
