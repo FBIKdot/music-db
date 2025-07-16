@@ -2,7 +2,7 @@ import { DB } from "./db.ts";
 
 if (import.meta.main) {
   while (true) {
-    console.log("Commands: add / add-loop / sync / exit");
+    console.log("Commands: add / add-loop / sync / format (fmt) / exit");
     const input: string | null = prompt(">");
     switch (input) {
       case "exit":
@@ -18,7 +18,12 @@ if (import.meta.main) {
       case "sync":
         await DB.sync();
         break;
-      // TODO: 添加除了dova之外的music
+      case "format":
+      case "fmt":
+        DB.save();
+        console.log("Format Complete.");
+        break;
+
       default:
         console.log("Unknow command.");
         break;

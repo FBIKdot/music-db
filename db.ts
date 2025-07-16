@@ -49,7 +49,7 @@ export class DB {
       return { dova: {}, pixabay: {}, incompetech: {} };
     }
   })() as DBStyle;
-  private static save() {
+  public static save() {
     /**
      * ES6 规范明确：对象中非数字字符串 key 的插入顺序保留，纯数字的字符串会被自动排序
      * 相当于作者名称不排序，id 排序
@@ -183,7 +183,7 @@ export class DB {
       await this.download(url, save_path);
     }
 
-    console.log("\nSync Complete!\n");
+    console.log("\nSync Complete!");
   }
   private static async download(
     url: string,
