@@ -5,7 +5,6 @@ if (import.meta.main) {
     console.log("Commands: add / add-loop / sync / exit");
     const input: string | null = prompt(">");
     switch (input) {
-      case null:
       case "exit":
         console.log("Program exit.");
         Deno.exit();
@@ -24,6 +23,7 @@ if (import.meta.main) {
         console.log("Unknow command.");
         break;
     }
+    console.log("");
   }
 }
 async function add(is_loop_adding: boolean = false): Promise<void> {
@@ -37,14 +37,14 @@ async function add(is_loop_adding: boolean = false): Promise<void> {
   const input = prompt("[name] composed by [Author]>");
   if (!input) {
     console.log("no input anything");
-    return Promise.resolve();
+    return;
   }
 
   const [name, author] = input.split(" composed by ");
   const input2 = prompt("music id>");
   if (!input2) {
     console.log("no input anything");
-    return Promise.resolve();
+    return;
   }
   const id: string = input2;
 
