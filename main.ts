@@ -74,7 +74,6 @@ async function add(is_loop_adding: boolean = false): Promise<void> {
 
   // TODO: dova看起来不怎么变，也许可以爬取一些补充信息
   DB.addDova(author, name, id, tracks, loop);
-  console.log("Database's changes were saved");
 
   if (is_loop_adding) {
     return Promise.resolve().then(() => add(true));

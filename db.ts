@@ -86,6 +86,7 @@ export class DB {
     }
 
     this.save();
+    console.log("Database's changes were saved");
   }
 
   // TODO: add incompetech (https://incompetech.com/music/royalty-free/music.html)
