@@ -1,23 +1,42 @@
 import * as YAML from "@std/yaml";
 import { ensureDir, ensureFile, exists } from "@std/fs";
+
 export interface DBStyle {
-  dova: {
-    // authors
-    [key: string]: {
-      // music id
-      [key: string]: {
-        name: string;
-        url: string;
-        tracks?: number;
-        loop: boolean[];
-      };
+  dova: DovaStyle;
+  pixabay: DefaultStyle[];
+  incompetech: IncompetechStyle[];
+}
+
+export interface DovaStyle {
+  // authors
+  [author: string]: {
+    // music id
+    [id: string]: {
+      name: string;
+      url: string;
+      tracks?: number;
+      loop: boolean[];
     };
   };
 }
 
+export interface DefaultStyle {
+  name: string;
+  author: string;
+  site: string;
+  download_link: string;
+}
+
+export interface IncompetechStyle {
+  name: string;
+  // author: "Kevin MacLeod";
+  site: string;
+  download_link: string;
+}
+
 export class DB {
   private static _db_path = "./db.yaml";
-  private static music_dir = "music";
+  private static musics_dir = "music";
 
   private static data = (() => {
     ensureFile(this._db_path);
@@ -27,7 +46,7 @@ export class DB {
     if (data) {
       return data;
     } else {
-      return { dova: {} };
+      return { dova: {}, pixabay: {}, incompetech: {} };
     }
   })() as DBStyle;
   private static save() {
@@ -39,8 +58,13 @@ export class DB {
     Deno.writeTextFileSync(this._db_path, YAML.stringify(this.data));
   }
 
+  private static music_save_dirs = {
+    dova: "dova",
+    pixabay: "pixabay",
+    incompetech: "incompetech",
+  };
+
   // dova
-  private static dova_music_dir = "dova";
   private static dova_domains = [
     "dova4.heteml.net",
     "dova3.heteml.net",
@@ -89,53 +113,104 @@ export class DB {
     console.log("Database's changes were saved");
   }
 
-  // TODO: add incompetech (https://incompetech.com/music/royalty-free/music.html)
-
   public static async sync() {
-    await ensureDir(this.music_dir);
-    await ensureDir(`${this.music_dir}/${this.dova_music_dir}`);
-    const dova_music_list: [string, string, string][] = Object
+    await ensureDir(this.musics_dir);
+
+    // ensure all music dirs
+    for (const element of Object.values(this.music_save_dirs)) {
+      await ensureDir(`${this.musics_dir}/${element}`);
+    }
+
+    type DownloadDetail = [string, string];
+
+    // dova music list
+    const dova_music_list: DownloadDetail[] = Object
       .values(this.data.dova)
       .flatMap((songs) =>
         Object.entries(songs).flatMap(([id, { tracks }]) => {
           const paths = this.getDovaFilesName(id, tracks ? tracks : 1);
           return paths.map((path) =>
             [
-              id,
               `/dova/mp3/${path}`,
-              `${this.music_dir}/${this.dova_music_dir}/${path}`,
-            ] as [string, string, string]
+              `${this.musics_dir}/${this.music_save_dirs.dova}/${path}`,
+            ] as DownloadDetail
           );
         })
       );
-    console.log(dova_music_list);
+    console.log("Dova music list:", dova_music_list);
+
+    const pixabay_music_list: DownloadDetail[] = this.data.pixabay.map(
+      (element) => {
+        return [
+          element.download_link,
+          `${this.musics_dir}/${this.music_save_dirs.pixabay}/${element.name} - ${element.author}.mp3`,
+        ];
+      },
+    );
+    console.log("pixabay music list:", pixabay_music_list);
+
+    const incompetech_music_list: DownloadDetail[] = this.data.incompetech
+      .map(
+        (element) => {
+          return [
+            element.download_link,
+            `${this.musics_dir}/${this.music_save_dirs.incompetech}/${element.name}.mp3`,
+          ];
+        },
+      );
+    console.log("Incompetech music list:", incompetech_music_list);
+
+    const download_list: DownloadDetail[] = [
+      ...pixabay_music_list,
+      ...incompetech_music_list,
+    ];
+
     // TODO: 支持并发
-    for (const [id, url_path, file_path] of dova_music_list) {
-      if (await exists(file_path, { isFile: true })) {
-        console.log(`File ${file_path} exist, skipping.`);
-        continue;
-      }
+
+    // download dova music
+    for (const [url_path, save_path] of dova_music_list) {
       for (const domain of this.dova_domains) {
         const url = `https://${domain}${url_path}`;
-        console.log(`Download: ${url} ...`);
-
-        const response = await fetch(url, {
-          headers: {
-            "Accept-Encoding": "br, gzip",
-          },
-        });
-        if (response.ok) {
-          const file = await Deno.open(file_path, {
-            write: true,
-            create: true,
-          });
-          await response.body?.pipeTo(file.writable);
-          console.log(`Success.`);
+        const shouldBreak = await this.download(url, save_path);
+        if (shouldBreak) {
           break;
-        } else {
-          console.log(`Fail: ${response.statusText}`);
         }
       }
+    }
+
+    //download others music
+    for (const [url, save_path] of download_list) {
+      await this.download(url, save_path);
+    }
+
+    console.log("\nSync Complete!\n");
+  }
+  private static async download(
+    url: string,
+    save_path: string,
+  ): Promise<boolean> {
+    if (await exists(save_path, { isFile: true })) {
+      console.log(`File ${save_path} exist, skipping.`);
+      return true;
+    }
+    console.log(`Download: ${url} ...`);
+
+    const response = await fetch(url, {
+      headers: {
+        "Accept-Encoding": "br, gzip",
+      },
+    });
+    if (response.ok) {
+      const file = await Deno.open(save_path, {
+        write: true,
+        create: true,
+      });
+      await response.body?.pipeTo(file.writable);
+      console.log(`Success.`);
+      return true;
+    } else {
+      console.log(`Fail: ${response.statusText}`);
+      return false;
     }
   }
 }
