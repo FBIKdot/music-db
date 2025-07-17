@@ -160,15 +160,10 @@ export class DB {
       );
     console.log("Incompetech music list:", incompetech_music_list);
 
-    const download_list: DownloadDetail[] = [
-      ...pixabay_music_list,
-      ...incompetech_music_list,
-    ];
-
-    // TODO: 支持并发
-
-    // download dova music
-    for (const [url_path, save_path] of dova_music_list) {
+    // dova music download promise
+    const dova_download_promise_list = dova_music_list.map(async (
+      [url_path, save_path],
+    ) => {
       for (const domain of this.dova_domains) {
         const url = `https://${domain}${url_path}`;
         const shouldBreak = await this.download(url, save_path);
@@ -176,15 +171,23 @@ export class DB {
           break;
         }
       }
-    }
+    });
 
-    //download others music
-    for (const [url, save_path] of download_list) {
-      await this.download(url, save_path);
-    }
+    // others music download promise
+    const other_download_promise_list: Promise<boolean>[] = [
+      ...pixabay_music_list,
+      ...incompetech_music_list,
+    ].map(([url, save_path]: DownloadDetail) => this.download(url, save_path));
 
+    // start download
+    console.log("Start downloading");
+    await Promise.all([
+      ...dova_download_promise_list,
+      ...other_download_promise_list,
+    ]);
     console.log("\nSync Complete!");
   }
+
   private static async download(
     url: string,
     save_path: string,
@@ -193,7 +196,6 @@ export class DB {
       console.log(`File ${save_path} exist, skipping.`);
       return true;
     }
-    console.log(`Download: ${url} ...`);
 
     const response = await fetch(url, {
       headers: {
@@ -206,7 +208,7 @@ export class DB {
         create: true,
       });
       await response.body?.pipeTo(file.writable);
-      console.log(`Success.`);
+      console.log(`Download: ${url} success!`);
       return true;
     } else {
       console.log(`Fail: ${response.statusText}`);
