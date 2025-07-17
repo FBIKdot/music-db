@@ -77,7 +77,8 @@ async function add(is_loop_adding: boolean = false): Promise<void> {
     `${loop.map((v, i) => `track ${i + 1} ${v ? "✓" : "✕"}`).join(", ")}`,
   );
 
-  // TODO: dova看起来不怎么变，也许可以爬取一些补充信息
+  // 爬取素材信息违反dova的terms of use，因此手动输入信息
+
   DB.addDova(author, name, id, tracks, loop);
 
   if (is_loop_adding) {
