@@ -1,6 +1,11 @@
 import { DB } from "./db.ts";
 
 if (import.meta.main) {
+  console.log(
+    `music-db v${JSON.parse(Deno.readTextFileSync("deno.json"))["version"]}`,
+  );
+  if (Deno.args.includes("-v") || Deno.args.includes("--version")) Deno.exit();
+
   while (true) {
     console.log("Commands: add / add-loop / sync / format (fmt) / exit");
     const input: string | null = prompt(">");
