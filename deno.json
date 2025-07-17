@@ -1,6 +1,7 @@
 {
   "tasks": {
-    "start": "deno run --allow-read --allow-write --allow-net main.ts"
+    "start": "deno run --allow-read --allow-write --allow-net main.ts",
+    "build": "deno compile --allow-read --allow-write --allow-net -o dist/ main.ts"
   },
   "imports": {
     "@std/cli": "jsr:@std/cli@^1.0.20",
