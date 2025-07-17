@@ -1,9 +1,8 @@
 import { DB } from "./db.ts";
+import DenoJson from "./deno.json" with { type: "json" };
 
 if (import.meta.main) {
-  console.log(
-    `music-db v${JSON.parse(Deno.readTextFileSync("deno.json"))["version"]}`,
-  );
+  console.log(`music-db v${DenoJson.version}`);
   if (Deno.args.includes("-v") || Deno.args.includes("--version")) Deno.exit();
 
   while (true) {
