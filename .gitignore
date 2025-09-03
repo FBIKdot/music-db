@@ -2,3 +2,4 @@
 music
 db.yaml
 dist
+.env
