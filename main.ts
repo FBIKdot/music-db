@@ -35,57 +35,55 @@ if (import.meta.main) {
     console.log("");
   }
 }
-async function add(is_loop_adding: boolean = false): Promise<void> {
-  if (is_loop_adding) {
-    console.log(
-      "\nLoop adding until you input nothing when asking you for name, author or id",
-    );
-  }
-
-  console.log("Add dova music:");
-  const input = prompt("[name] composed by [Author]>");
-  if (!input) {
-    console.log("no input anything");
-    return;
-  }
-
-  const [name, author] = input.split(" composed by ");
-  const input2 = prompt("music id>");
-  if (!input2) {
-    console.log("no input anything");
-    return;
-  }
-  const id: string = input2;
-
-  const input3 = prompt("how many tracks>");
-  if (!input3) {
-    console.log("no input anything. default: only 1 track");
-  }
-  const tracks = input3 ? Number(input3) : 1;
-
-  const input4 = prompt(
-    `loop? (type "y"${tracks !== 1 ? ', use "," to split each track' : ""})>`,
-  );
-  const loop: boolean[] = [];
-  if (!input4) {
-    console.log("input not available, default: both not loop");
-  } else {
-    for (const str of input4.split(",")) {
-      loop.push(str === "y");
+function add(is_loop_adding: boolean = false): void {
+  do {
+    if (is_loop_adding) {
+      console.log(
+        "\nLoop adding until you input nothing when asking you for name, author or id",
+      );
     }
-  }
 
-  console.log(
-    `Add music: ${name} - ${author} ${tracks} tracks ${DB.getDovaUrl(id)}`,
-    "\nloop:",
-    `${loop.map((v, i) => `track ${i + 1} ${v ? "✓" : "✕"}`).join(", ")}`,
-  );
+    console.log("Add dova music:");
+    const input = prompt("[name] composed by [Author]>");
+    if (!input) {
+      console.log("no input anything");
+      return;
+    }
 
-  // 爬取素材信息违反dova的terms of use，因此手动输入信息
+    const [name, author] = input.split(" composed by ");
+    const input2 = prompt("music id>");
+    if (!input2) {
+      console.log("no input anything");
+      return;
+    }
+    const id: string = input2;
 
-  DB.addDova(author, name, id, tracks, loop);
+    const input3 = prompt("how many tracks>");
+    if (!input3) {
+      console.log("no input anything. default: only 1 track");
+    }
+    const tracks = input3 ? Number(input3) : 1;
 
-  if (is_loop_adding) {
-    return Promise.resolve().then(() => add(true));
-  }
+    const input4 = prompt(
+      `loop? (type "y"${tracks !== 1 ? ', use "," to split each track' : ""})>`,
+    );
+    const loop: boolean[] = [];
+    if (!input4) {
+      console.log("input not available, default: both not loop");
+    } else {
+      for (const str of input4.split(",")) {
+        loop.push(str === "y");
+      }
+    }
+
+    console.log(
+      `Add music: ${name} - ${author} ${tracks} tracks ${DB.getDovaUrl(id)}`,
+      "\nloop:",
+      `${loop.map((v, i) => `track ${i + 1} ${v ? "✓" : "✕"}`).join(", ")}`,
+    );
+
+    // 爬取素材信息违反dova的terms of use，因此手动输入信息
+
+    DB.addDova(author, name, id, tracks, loop);
+  } while (is_loop_adding);
 }
