@@ -11,7 +11,7 @@ export interface DefaultStyle {
 export class DefaultAdapter extends Adapter {
   protected constructor() {
     super();
-    this.db = Database.get<DefaultStyle[]>(this.PATH);
+    this.DB = Database.get<DefaultStyle[]>(this.PATH);
   }
 
   public override readonly PATH: string = "default";
@@ -21,7 +21,7 @@ export class DefaultAdapter extends Adapter {
     DefaultAdapter.Instance = new DefaultAdapter();
   }
 
-  protected readonly db: DefaultStyle[];
+  protected readonly DB: DefaultStyle[];
 
   /**
    * 添加乐曲
@@ -42,7 +42,7 @@ export class DefaultAdapter extends Adapter {
         }
         data[key as keyof DefaultStyle] = input;
       }
-      this.db.push(data as DefaultStyle);
+      this.DB.push(data as DefaultStyle);
     } while (isLoop);
   }
 
@@ -51,7 +51,7 @@ export class DefaultAdapter extends Adapter {
    */
   public register() {
     return () =>
-      this.db.map((item) => ({
+      this.DB.map((item) => ({
         filename: `${item.name} - ${item.author}.mp3`,
         filepath: this.PATH,
         url: item.download_link,
