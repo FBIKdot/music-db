@@ -56,7 +56,13 @@ export class DB {
      * 相当于作者名称不排序，id 排序
      * 正好符合我意
      */
-    Deno.writeTextFileSync(this._db_path, YAML.stringify(this.data));
+    Deno.writeTextFileSync(
+      this._db_path,
+      YAML.stringify(this.data, {
+        // 不使用 >- 换行
+        lineWidth: Infinity,
+      }),
+    );
   }
 
   private static music_save_dirs = {
@@ -171,7 +177,7 @@ export class DB {
           ];
         },
       );
-    console.log("Incompetech music list:", incompetech_music_list);
+    // console.log("Incompetech music list:", incompetech_music_list);
 
     // dova music download promise
     const dova_download_promise_list = dova_music_list.map(async (
