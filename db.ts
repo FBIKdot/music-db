@@ -5,6 +5,7 @@ export interface DBStyle {
   dova: DovaStyle;
   pixabay: DefaultStyle[];
   incompetech: IncompetechStyle[];
+  freemusicarchive: DefaultStyle[];
 }
 
 export interface DovaStyle {
@@ -46,7 +47,7 @@ export class DB {
     if (data) {
       return data;
     } else {
-      return { dova: {}, pixabay: {}, incompetech: {} };
+      return { dova: {}, pixabay: {}, incompetech: {}, freemusicarchive: {} };
     }
   })() as DBStyle;
   public static save() {
@@ -62,6 +63,7 @@ export class DB {
     dova: "dova",
     pixabay: "pixabay",
     incompetech: "incompetech",
+    freemusicarchive: "freemusicarchive",
   };
 
   // dova
@@ -137,7 +139,7 @@ export class DB {
           );
         })
       );
-    console.log("Dova music list:", dova_music_list);
+    // console.log("Dova music list:", dova_music_list);
 
     const pixabay_music_list: DownloadDetail[] = this.data.pixabay.map(
       (element) => {
@@ -147,7 +149,18 @@ export class DB {
         ];
       },
     );
-    console.log("pixabay music list:", pixabay_music_list);
+    // console.log("pixabay music list:", pixabay_music_list);
+
+    const freemusicarchive_music_list: DownloadDetail[] = this.data
+      .freemusicarchive.map(
+        (element) => {
+          return [
+            element.download_link,
+            `${this.musics_dir}/${this.music_save_dirs.freemusicarchive}/${element.name} - ${element.author}.mp3`,
+          ];
+        },
+      );
+    // console.log("freemusicarchive music list:", freemusicarchive_music_list);
 
     const incompetech_music_list: DownloadDetail[] = this.data.incompetech
       .map(
@@ -177,6 +190,7 @@ export class DB {
     const other_download_promise_list: Promise<boolean>[] = [
       ...pixabay_music_list,
       ...incompetech_music_list,
+      ...freemusicarchive_music_list,
     ].map(([url, save_path]: DownloadDetail) => this.download(url, save_path));
 
     // start download
