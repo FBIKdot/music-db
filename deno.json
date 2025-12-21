@@ -6,9 +6,9 @@
     "build": "deno compile --allow-read --allow-write --allow-net --target x86_64-pc-windows-msvc -o dist/ main.ts"
   },
   "imports": {
-    "@std/cli": "jsr:@std/cli@^1.0.20",
-    "@std/fs": "jsr:@std/fs@^1.0.19",
-    "@std/yaml": "jsr:@std/yaml@^1.0.8"
+    "@std/cli": "jsr:@std/cli@^1.0.24",
+    "@std/fs": "jsr:@std/fs@^1.0.20",
+    "@std/yaml": "jsr:@std/yaml@^1.0.10"
   },
   "fmt": {
     "exclude": [
