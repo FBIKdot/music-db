@@ -18,7 +18,7 @@ export class IncompetechAdapter extends Adapter {
     IncompetechAdapter.Instance = new IncompetechAdapter();
   }
 
-  private db = Database.get<IncompetechStyle[]>(this.PATH);
+  private readonly DB = Database.get<IncompetechStyle[]>(this.PATH);
 
   /**
    * 添加乐曲
@@ -38,7 +38,7 @@ export class IncompetechAdapter extends Adapter {
         }
         data[key as keyof IncompetechStyle] = input;
       }
-      this.db.push(data as IncompetechStyle);
+      this.DB.push(data as IncompetechStyle);
     } while (isLoop);
   }
 
@@ -47,7 +47,7 @@ export class IncompetechAdapter extends Adapter {
    */
   public register() {
     return () =>
-      this.db.map((item) => ({
+      this.DB.map((item) => ({
         filename: `${item.name}.mp3`,
         filepath: `incompetech`,
         url: item.download_link,
