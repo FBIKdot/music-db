@@ -13,10 +13,7 @@ export class IncompetechAdapter extends Adapter {
   }
   public override PATH: string = "incompetech";
 
-  public static override Instance: IncompetechAdapter;
-  static {
-    IncompetechAdapter.Instance = new IncompetechAdapter();
-  }
+  public static override Instance = new IncompetechAdapter();
 
   private readonly DB = Database.get<IncompetechStyle[]>(this.PATH);
 

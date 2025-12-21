@@ -10,8 +10,5 @@ export class FreeMusicArchiveAdapter extends DefaultAdapter {
 
   protected override readonly DB = Database.get<DefaultStyle[]>(this.PATH);
 
-  public static override Instance: FreeMusicArchiveAdapter;
-  static {
-    FreeMusicArchiveAdapter.Instance = new FreeMusicArchiveAdapter();
-  }
+  public static override Instance = new FreeMusicArchiveAdapter();
 }

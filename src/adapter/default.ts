@@ -15,10 +15,7 @@ export class DefaultAdapter extends Adapter {
 
   public override readonly PATH: string = "default";
 
-  public static override Instance: DefaultAdapter;
-  static {
-    DefaultAdapter.Instance = new DefaultAdapter();
-  }
+  public static override Instance = new DefaultAdapter();
 
   protected readonly DB = Database.get<DefaultStyle[]>(this.PATH);
 
