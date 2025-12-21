@@ -22,12 +22,13 @@ export class IncompetechAdapter extends Adapter {
    */
   public add(isLoop: boolean = false) {
     do {
-      const data: Partial<IncompetechStyle> = {
-        site: undefined,
-        name: undefined,
-        download_link: undefined,
-      };
-      for (const key of Object.keys(data)) {
+      const data: Partial<IncompetechStyle> = {};
+      const keys: (keyof IncompetechStyle)[] = [
+        "name",
+        "site",
+        "download_link",
+      ];
+      for (const key of keys) {
         const input: string | null = prompt(`${key}?> `);
         if (!input) {
           console.log("no input anything, stop adding.");

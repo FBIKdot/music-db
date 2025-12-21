@@ -24,13 +24,14 @@ export class DefaultAdapter extends Adapter {
    */
   public add(isLoop: boolean = false) {
     do {
-      const data: Partial<DefaultStyle> = {
-        site: undefined,
-        author: undefined,
-        name: undefined,
-        download_link: undefined,
-      };
-      for (const key of Object.keys(data)) {
+      const data: Partial<DefaultStyle> = {};
+      const keys: (keyof DefaultStyle)[] = [
+        "name",
+        "author",
+        "site",
+        "download_link",
+      ];
+      for (const key of keys) {
         const input: string | null = prompt(`${key}?> `);
         if (!input) {
           console.log("no input anything, stop adding.");
