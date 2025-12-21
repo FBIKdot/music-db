@@ -11,7 +11,6 @@ export interface DefaultStyle {
 export class DefaultAdapter extends Adapter {
   protected constructor() {
     super();
-    this.DB = Database.get<DefaultStyle[]>(this.PATH);
   }
 
   public override readonly PATH: string = "default";
@@ -21,7 +20,7 @@ export class DefaultAdapter extends Adapter {
     DefaultAdapter.Instance = new DefaultAdapter();
   }
 
-  protected readonly DB: DefaultStyle[];
+  protected readonly DB = Database.get<DefaultStyle[]>(this.PATH);
 
   /**
    * 添加乐曲
