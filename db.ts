@@ -51,6 +51,21 @@ export class DB {
     }
   })() as DBStyle;
   public static save() {
+    // 补全 tracks 与 loop
+    const data = Object.values(this.data.dova).flatMap((x) => Object.values(x));
+    for (const element of data) {
+      for (let i = 0; i < (element.tracks ?? 1); i++) {
+        element.tracks ??= 1;
+        if (!element.loop) {
+          element.loop = [];
+        }
+        if (!element.loop[i]) {
+          // 补全 loop 数组，不足的补 false
+          element.loop[i] = false;
+        }
+      }
+    }
+
     /**
      * ES6 规范明确：对象中非数字字符串 key 的插入顺序保留，纯数字的字符串会被自动排序
      * 相当于作者名称不排序，id 排序
@@ -115,6 +130,9 @@ export class DB {
     };
     if (tracks > 1 && Number.isInteger(tracks)) {
       this.data.dova[author][id].tracks = tracks;
+    } else {
+      // 单轨音乐默认设置为 1 轨
+      this.data.dova[author][id].tracks = 1;
     }
 
     this.save();

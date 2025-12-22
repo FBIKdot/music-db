@@ -75,7 +75,12 @@ function add(is_loop_adding: boolean = false): void {
         loop.push(str === "y");
       }
     }
-
+    // 补全 loop 数组，不足的补 false
+    for (let i = 0; i < tracks; i++) {
+      if (!loop[i]) {
+        loop[i] = false;
+      }
+    }
     console.log(
       `Add music: ${name} - ${author} ${tracks} tracks ${DB.getDovaUrl(id)}`,
       "\nloop:",
