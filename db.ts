@@ -150,19 +150,19 @@ export class DB {
     type DownloadDetail = [string, string];
 
     // dova music list
-    const dova_music_list: DownloadDetail[] = Object
-      .values(this.data.dova)
-      .flatMap((songs) =>
-        Object.entries(songs).flatMap(([id, { tracks }]) => {
-          const paths = this.getDovaFilesName(id, tracks ? tracks : 1);
-          return paths.map((path) =>
-            [
-              `/dova/mp3/${path}`,
-              `${this.musics_dir}/${this.music_save_dirs.dova}/${path}`,
-            ] as DownloadDetail
-          );
-        })
-      );
+    // const dova_music_list: DownloadDetail[] = Object
+    //   .values(this.data.dova)
+    //   .flatMap((songs) =>
+    //     Object.entries(songs).flatMap(([id, { tracks }]) => {
+    //       const paths = this.getDovaFilesName(id, tracks ? tracks : 1);
+    //       return paths.map((path) =>
+    //         [
+    //           `/dova/mp3/${path}`,
+    //           `${this.musics_dir}/${this.music_save_dirs.dova}/${path}`,
+    //         ] as DownloadDetail
+    //       );
+    //     })
+    //   );
     // console.log("Dova music list:", dova_music_list);
 
     const pixabay_music_list: DownloadDetail[] = this.data.pixabay.map(
@@ -198,17 +198,17 @@ export class DB {
     // console.log("Incompetech music list:", incompetech_music_list);
 
     // dova music download promise
-    const dova_download_promise_list = dova_music_list.map(async (
-      [url_path, save_path],
-    ) => {
-      for (const domain of this.dova_domains) {
-        const url = `https://${domain}${url_path}`;
-        const shouldBreak = await this.download(url, save_path);
-        if (shouldBreak) {
-          break;
-        }
-      }
-    });
+    // const dova_download_promise_list = dova_music_list.map(async (
+    //   [url_path, save_path],
+    // ) => {
+    //   for (const domain of this.dova_domains) {
+    //     const url = `https://${domain}${url_path}`;
+    //     const shouldBreak = await this.download(url, save_path);
+    //     if (shouldBreak) {
+    //       break;
+    //     }
+    //   }
+    // });
 
     // others music download promise
     const other_download_promise_list: Promise<boolean>[] = [
@@ -220,7 +220,7 @@ export class DB {
     // start download
     console.log("Start downloading");
     await Promise.all([
-      ...dova_download_promise_list,
+      // ...dova_download_promise_list,
       ...other_download_promise_list,
     ]);
     console.log("\nSync Complete!");
@@ -249,7 +249,7 @@ export class DB {
       console.log(`Download: ${url} success!`);
       return true;
     } else {
-      console.log(`Fail: ${response.statusText}`);
+      console.log(`Fail: ${url} ${response.statusText}`);
       return false;
     }
   }
