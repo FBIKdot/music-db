@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "tasks": {
     "start": "deno run --env-file --allow-read --allow-write --allow-net main.ts",
-    "build": "deno compile --allow-read --allow-write --allow-net --target x86_64-pc-windows-msvc -o dist/ main.ts"
+    "build": "deno compile --allow-read --allow-write --allow-net --engine quickjs --target x86_64-pc-windows-msvc -o dist/ main.ts",
+    "preview": "./dist/music-db"
   },
   "exports": {
     ".": "./main.ts"
   },
   "imports": {
-    "@std/cli": "jsr:@std/cli@^1.0.24",
     "@std/fs": "jsr:@std/fs@^1.0.20",
     "@std/path": "jsr:@std/path@^1.1.3",
     "@std/yaml": "jsr:@std/yaml@^1.0.10"
