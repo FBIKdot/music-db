@@ -1,5 +1,18 @@
 import * as YAML from "@std/yaml";
-import { ensureDir, ensureFileSync, exists } from "@std/fs";
+import {
+  closeSync,
+  createWriteStream,
+  mkdirSync,
+  openSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
+import { mkdir } from "node:fs/promises";
+import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import type { ReadableStream as NodeWebReadableStream } from "node:stream/web";
+import { dirname } from "node:path";
 
 export interface DBStyle {
   dova: DovaStyle;
@@ -42,7 +55,7 @@ export class DB {
   private static data = (() => {
     ensureFileSync(this._db_path);
     const data = YAML.parse(
-      Deno.readTextFileSync(this._db_path),
+      readFileSync(this._db_path, "utf8"),
     );
     if (data) {
       return data;
@@ -71,7 +84,7 @@ export class DB {
      * 相当于作者名称不排序，id 排序
      * 正好符合我意
      */
-    Deno.writeTextFileSync(
+    writeFileSync(
       this._db_path,
       YAML.stringify(this.data, {
         // 不使用 >- 换行
@@ -140,11 +153,11 @@ export class DB {
   }
 
   public static async sync() {
-    await ensureDir(this.musics_dir);
+    await mkdir(this.musics_dir, { recursive: true });
 
     // ensure all music dirs
     for (const element of Object.values(this.music_save_dirs)) {
-      await ensureDir(`${this.musics_dir}/${element}`);
+      await mkdir(`${this.musics_dir}/${element}`, { recursive: true });
     }
 
     type DownloadDetail = [string, string];
@@ -230,7 +243,7 @@ export class DB {
     url: string,
     save_path: string,
   ): Promise<boolean> {
-    if (await exists(save_path, { isFile: true })) {
+    if (fileExists(save_path)) {
       console.log(`File ${save_path} exist, skipping.`);
       return true;
     }
@@ -241,16 +254,32 @@ export class DB {
       },
     });
     if (response.ok) {
-      const file = await Deno.open(save_path, {
-        write: true,
-        create: true,
-      });
-      await response.body?.pipeTo(file.writable);
+      if (response.body) {
+        await pipeline(
+          Readable.fromWeb(
+            response.body as unknown as NodeWebReadableStream<Uint8Array>,
+          ),
+          createWriteStream(save_path),
+        );
+      }
       console.log(`Download: ${url} success!`);
       return true;
     } else {
       console.log(`Fail: ${url} ${response.statusText}`);
       return false;
     }
+  }
+}
+
+function ensureFileSync(path: string) {
+  mkdirSync(dirname(path), { recursive: true });
+  closeSync(openSync(path, "a"));
+}
+
+function fileExists(path: string): boolean {
+  try {
+    return statSync(path).isFile();
+  } catch {
+    return false;
   }
 }

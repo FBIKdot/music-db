@@ -1,17 +1,33 @@
 import { DB } from "./db.ts";
-import DenoJson from "./deno.json" with { type: "json" };
+import pkg from "./package.json" with { type: "json" };
+import * as readline from "node:readline/promises";
+import { stdin, stdout } from "node:process";
+import { pathToFileURL } from "node:url";
 
-if (import.meta.main) {
-  console.log(`music-db v${DenoJson.version}`);
-  if (Deno.args.includes("-v") || Deno.args.includes("--version")) Deno.exit();
+const rl = readline.createInterface({ input: stdin, output: stdout });
+// Deno 的 prompt 是同步的，Node 需用 readline 异步实现；EOF 时返回 null 保持语义一致
+async function prompt(message = ""): Promise<string | null> {
+  try {
+    return await rl.question(message);
+  } catch {
+    return null;
+  }
+}
+
+const args = process.argv.slice(2);
+const isMain = import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isMain) {
+  console.log(`music-db v${pkg.version}`);
+  if (args.includes("-v") || args.includes("--version")) process.exit();
 
   while (true) {
     console.log("Commands: add / add-loop / sync / format (fmt) / exit");
-    const input: string | null = prompt(">");
+    const input = await prompt(">");
     switch (input) {
       case "exit":
         console.log("Program exit.");
-        Deno.exit();
+        process.exit();
         break;
       case "add":
         await add();
@@ -35,7 +51,7 @@ if (import.meta.main) {
     console.log("");
   }
 }
-function add(is_loop_adding: boolean = false): void {
+async function add(is_loop_adding: boolean = false): Promise<void> {
   do {
     if (is_loop_adding) {
       console.log(
@@ -44,27 +60,27 @@ function add(is_loop_adding: boolean = false): void {
     }
 
     console.log("Add dova music:");
-    const input = prompt("[name] composed by [Author]>");
+    const input = await prompt("[name] composed by [Author]>");
     if (!input) {
       console.log("no input anything");
       return;
     }
 
     const [name, author] = input.split(" composed by ");
-    const input2 = prompt("music id>");
+    const input2 = await prompt("music id>");
     if (!input2) {
       console.log("no input anything");
       return;
     }
     const id: string = input2;
 
-    const input3 = prompt("how many tracks>");
+    const input3 = await prompt("how many tracks>");
     if (!input3) {
       console.log("no input anything. default: only 1 track");
     }
     const tracks = input3 ? Number(input3) : 1;
 
-    const input4 = prompt(
+    const input4 = await prompt(
       `loop? (type "y"${tracks !== 1 ? ', use "," to split each track' : ""})>`,
     );
     const loop: boolean[] = [];

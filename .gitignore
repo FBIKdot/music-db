@@ -1,5 +1,8 @@
 .vscode
 music
-db.yaml
 dist
 .env
+node_modules
+*.yaml
+**.yml
+**.exe
