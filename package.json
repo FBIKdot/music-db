@@ -6,7 +6,8 @@
     "node": ">=22.6.0"
   },
   "scripts": {
-    "start": "node --experimental-strip-types main.ts"
+    "start": "node --experimental-strip-types main.ts",
+    "build" :"ant compile main.ts --root=. --runtime=ant-runtime.exe -o music-db.ant.exe"
   },
   "dependencies": {
     "@std/path": "jsr:^1.1.6",
